@@ -19,8 +19,8 @@ x64/
 x86/
 bld/
 [Bb]in/*/*
-!quizics.exe
-!quizics.mdf
+!*.exe
+*.vshost.exe
 [Oo]bj/
 
 # Visual Studio 2015 cache/options directory
@@ -200,7 +200,7 @@ UpgradeLog*.XML
 UpgradeLog*.htm
 
 # SQL Server files
-
+*.mdf
 *.ldf
 
 # Business Intelligence projects
