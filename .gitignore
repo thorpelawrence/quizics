@@ -20,6 +20,7 @@ x86/
 bld/
 [Bb]in/*/*
 !*.exe
+!quizics.mdf
 *.vshost.exe
 *.exe.*
 [Oo]bj/
@@ -201,7 +202,6 @@ UpgradeLog*.XML
 UpgradeLog*.htm
 
 # SQL Server files
-*.mdf
 *.ldf
 
 # Business Intelligence projects
