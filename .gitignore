@@ -11,16 +11,16 @@
 *.userprefs
 
 # Build results
-[Dd]ebug/
+[Dd]ebug/*
 [Dd]ebugPublic/
 [Rr]elease/*
 [Rr]eleases/
 x64/
 x86/
 bld/
-[Bb]in/*/*
-!bin/Release/quizics.exe
-!bin/Release/quizics.mdf
+[Bb]in/**
+!quizics.exe
+!quizics.mdf
 [Oo]bj/
 
 # Visual Studio 2015 cache/options directory
