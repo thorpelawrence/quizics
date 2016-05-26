@@ -4,7 +4,7 @@
 
 Originally completed as AQA COMP4 Coursework
 
-**NOTE:** *this version is modified to use a local database instead of SQL Server*
+**NOTE:** *this version is modified to use a local database instead of SQL Server; personal information such as names have been removed from the documentation*
 
 ##### Documentation
 
