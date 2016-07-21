@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Data.SQLite;
 using System.Drawing;
-using System.Data.SqlClient;
 using System.Windows.Forms;
 
 namespace quizics
@@ -50,9 +50,9 @@ namespace quizics
                 !string.IsNullOrWhiteSpace(marksTextBox.Text)
                 )
             {
-                using (SqlConnection connection = new SqlConnection(Tools.connectionString))
+                using (SQLiteConnection connection = new SQLiteConnection(Tools.connectionString))
                 {
-                    using (SqlCommand command = new SqlCommand("INSERT INTO Questions VALUES "
+                    using (SQLiteCommand command = new SQLiteCommand("INSERT INTO Questions VALUES "
                         + "(@questionImage, @questionName, @questionAnswer, @questionMarks)", connection))
                     {
                         command.Parameters.AddWithValue("questionImage", Tools.ImageToByteArray(Image.FromFile(imageFileLocationTextBox.Text)));

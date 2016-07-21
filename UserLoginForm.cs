@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Data.SQLite;
 using System.Windows.Forms;
-using System.Data.SqlClient;
 using System.Drawing;
 
 namespace quizics
@@ -47,30 +47,30 @@ namespace quizics
         /// </summary>
         void Login()
         {
-            using (SqlConnection connection = new SqlConnection(Tools.connectionString))
+            using (SQLiteConnection connection = new SQLiteConnection(Tools.connectionString))
             {
                 //Get the userID for the username given
-                SqlCommand command = new SqlCommand("SELECT userID FROM Users WHERE username=@username", connection);
+                SQLiteCommand command = new SQLiteCommand("SELECT userID FROM Users WHERE username=@username", connection);
                 command.Parameters.AddWithValue("username", usernameTextBox.Text);
                 try
                 {
                     connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
+                    SQLiteDataReader reader = command.ExecuteReader();
                     //There will be a row if there was a username found (SQL WHERE)
                     if (reader.HasRows)
                     {
                         while (reader.Read())
                         {
-                            userID = ((int)reader["userID"]);
+                            userID = Convert.ToInt32(reader["userID"]);
                         }
                         connection.Close();
                         //If the user has a yearGroup of 0, they are a teacher
                         try
                         {
-                            if ((int)Tools.GetUserData(userID)["yearGroup"] == 0) teacherUser = true;
+                            if (Convert.ToInt32(Tools.GetUserData(userID)["yearGroup"]) == 0) teacherUser = true;
                             else teacherUser = false;
                         }
-                        catch { return; }
+                        catch (Exception ex){ MessageBox.Show(ex.Message); }
                         //Check if password is correct, if not shows message
                         if (CheckPassword())
                         {

@@ -1,8 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Windows.Forms;
-using System.Data.SqlClient;
 using System.Data;
+using System.Data.SQLite;
 
 
 namespace quizics
@@ -18,13 +17,13 @@ namespace quizics
         //Updates the DataGridView to show the data in the database
         void UpdateGrid()
         {
-            using (SqlConnection connection = new SqlConnection(Tools.connectionString))
+            using (SQLiteConnection connection = new SQLiteConnection(Tools.connectionString))
             {
-                using (SqlCommand command = new SqlCommand("SELECT * FROM Users", connection))
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM Users", connection))
                 {
                     try
                     {
-                        SqlDataAdapter dataAdapter = new SqlDataAdapter(command);
+                        SQLiteDataAdapter dataAdapter = new SQLiteDataAdapter(command);
                         DataTable dataTable = new DataTable();
                         dataAdapter.Fill(dataTable);
                         userDataGridView.DataSource = dataTable;
@@ -59,13 +58,13 @@ namespace quizics
             //Only update database if value changed, not when delete checkbox checked
             if (e.RowIndex != -1 && userDataGridView.Columns[e.ColumnIndex].Name != "deleteCheckBox")
             {
-                using (SqlConnection connection = new SqlConnection(Tools.connectionString))
+                using (SQLiteConnection connection = new SQLiteConnection(Tools.connectionString))
                 {
                     string changedColumn = userDataGridView.Columns[e.ColumnIndex].Name;
-                    using (SqlCommand command = new SqlCommand("UPDATE Users SET " + changedColumn + "=@newValue WHERE userID=@userID", connection))
+                    using (SQLiteCommand command = new SQLiteCommand("UPDATE Users SET " + changedColumn + "=@newValue WHERE userID=@userID", connection))
                     {
                         command.Parameters.AddWithValue("newValue", userDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
-                        command.Parameters.AddWithValue("userID", (int)userDataGridView.Rows[e.RowIndex].Cells["userID"].Value);
+                        command.Parameters.AddWithValue("userID", Convert.ToInt32(userDataGridView.Rows[e.RowIndex].Cells["userID"].Value));
                         try
                         {
                             connection.Open();
@@ -89,9 +88,9 @@ namespace quizics
                 //Check if delete checkbox is checked
                 if (Convert.ToBoolean(row.Cells["deleteCheckBox"].Value))
                 {
-                    using (SqlConnection connection = new SqlConnection(Tools.connectionString))
+                    using (SQLiteConnection connection = new SQLiteConnection(Tools.connectionString))
                     {
-                        using (SqlCommand command = new SqlCommand("DELETE FROM UserQuestion WHERE userID=@userID; DELETE FROM Users WHERE userID=@userID", connection))
+                        using (SQLiteCommand command = new SQLiteCommand("DELETE FROM UserQuestion WHERE userID=@userID; DELETE FROM Users WHERE userID=@userID", connection))
                         {
                             command.Parameters.AddWithValue("userID", row.Cells["userID"].Value);
                             try
@@ -105,7 +104,7 @@ namespace quizics
                         }
                     }
                     //Current user was deleted if the ID of a checked user is the same as the current logged in user's ID
-                    currentUserDeleted = ((int)row.Cells["userID"].Value == MainMDI.userID);
+                    currentUserDeleted = (Convert.ToInt32(row.Cells["userID"].Value) == MainMDI.userID);
                 }
             }
             //If the current user was deleted, exit
@@ -117,7 +116,7 @@ namespace quizics
         private void studentProgressButton_Click(object sender, EventArgs e)
         {
             //Get the ID of the user currently selected
-            int userID = (int)userDataGridView.Rows[userDataGridView.CurrentCell.RowIndex].Cells["userID"].Value;
+            int userID = Convert.ToInt32(userDataGridView.Rows[userDataGridView.CurrentCell.RowIndex].Cells["userID"].Value);
             new UserProgressForm(userID) { MdiParent = MdiParent }.Show();
         }
     }

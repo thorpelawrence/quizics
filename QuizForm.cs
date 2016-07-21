@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Drawing;
 using System.Collections.Generic;
-using System.IO;
+using System.Data.SQLite;
 using System.Drawing.Printing;
 using System.Windows.Forms;
-using System.Linq;
-using System.Data.SqlClient;
 
 namespace quizics
 {
@@ -132,7 +130,7 @@ namespace quizics
         /// <param name="numberOfQuestions"></param>
         void GenerateQuiz(int numberOfQuestions)
         {
-            using (SqlConnection connection = new SqlConnection(Tools.connectionString))
+            using (SQLiteConnection connection = new SQLiteConnection(Tools.connectionString))
             {
                 string quizName = "";
                 try
@@ -141,20 +139,20 @@ namespace quizics
                 }
                 catch { return; }
                 //Select the number of unique quizIDs for the user, to get a count of number of quizzes completed 
-                using (SqlCommand command = new SqlCommand("SELECT COUNT(DISTINCT quizID) FROM UserQuestion WHERE userID=@userID", connection))
+                using (SQLiteCommand command = new SQLiteCommand("SELECT COUNT(DISTINCT quizID) FROM UserQuestion WHERE userID=@userID", connection))
                 {
                     command.Parameters.AddWithValue("userID", MainMDI.userID);
                     try
                     {
                         connection.Open();
                         //The next quiz will the the (n+1) quiz so add 1 and add this number to the quiz name
-                        quizName += (int)command.ExecuteScalar() + 1;
+                        quizName += Convert.ToInt32(command.ExecuteScalar()) + 1;
                         connection.Close();
                     }
                     catch (Exception ex) { MessageBox.Show(ex.Message); }
                     finally { connection.Close(); }
                 }
-                using (SqlCommand command = new SqlCommand("INSERT INTO Quiz VALUES (@quizDateTime, @quizName)", connection))
+                using (SQLiteCommand command = new SQLiteCommand("INSERT INTO Quiz VALUES (NULL, @quizDateTime, @quizName)", connection))
                 {
                     command.Parameters.AddWithValue("quizDateTime", DateTime.Now);
                     command.Parameters.AddWithValue("quizName", quizName);
@@ -168,12 +166,12 @@ namespace quizics
                     finally { connection.Close(); }
                 }
                 //Get the last added quizID
-                using (SqlCommand command = new SqlCommand("SELECT MAX(quizID) FROM Quiz", connection))
+                using (SQLiteCommand command = new SQLiteCommand("SELECT MAX(quizID) FROM Quiz", connection))
                 {
                     try
                     {
                         connection.Open();
-                        quizID = (int)command.ExecuteScalar();
+                        quizID = Convert.ToInt32(command.ExecuteScalar());
                         connection.Close();
                     }
                     catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -181,12 +179,12 @@ namespace quizics
                 }
                 int questionIDCount = 0;
                 //Get number of question IDs in database
-                using (SqlCommand command = new SqlCommand("SELECT COUNT(questionID) FROM Questions", connection))
+                using (SQLiteCommand command = new SQLiteCommand("SELECT COUNT(questionID) FROM Questions", connection))
                 {
                     try
                     {
                         connection.Open();
-                        questionIDCount = (int)command.ExecuteScalar();
+                        questionIDCount = Convert.ToInt32(command.ExecuteScalar());
                         connection.Close();
                     }
                     catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -205,13 +203,13 @@ namespace quizics
                 //List used to temporarily store questionIDs to check which are used
                 List<int> randomQuestionIDList = new List<int>();
                 //Select a random list of questions from the database
-                using (SqlCommand command = new SqlCommand("SELECT TOP (@numberOfQuestions) questionID FROM Questions ORDER BY (NEWID())", connection))
+                using (SQLiteCommand command = new SQLiteCommand("SELECT questionID FROM Questions ORDER BY RANDOM() LIMIT (@numberOfQuestions)", connection))
                 {
                     command.Parameters.AddWithValue("numberOfQuestions", numberOfQuestions);
                     try
                     {
                         connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        using (SQLiteDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
@@ -227,7 +225,7 @@ namespace quizics
                 int questionIndex = 0;
                 foreach (int randomQuestionID in randomQuestionIDList)
                 {
-                    using (SqlCommand command = new SqlCommand("INSERT INTO QuizQuestions VALUES "
+                    using (SQLiteCommand command = new SQLiteCommand("INSERT INTO QuizQuestions VALUES "
                         + "(@quizID, @questionID, @questionIndex)", connection))
                     {
                         command.Parameters.AddWithValue("quizID", quizID);
@@ -244,7 +242,7 @@ namespace quizics
                         //Sum marks for each question to set maximum marks available for quiz
                         try
                         {
-                            quizMaximumMarks += (int)Tools.GetQuestionData(quizID, questionIndex)["questionMarks"];
+                            quizMaximumMarks += Convert.ToInt32(Tools.GetQuestionData(quizID, questionIndex)["questionMarks"]);
                         }
                         catch { return; }
                         questionIndex++;
@@ -310,7 +308,7 @@ namespace quizics
                     //Add marks for question
                     try
                     {
-                        marksAchieved += (int)Tools.GetQuestionData(quizID, quizQuestionIndex)["questionMarks"];
+                        marksAchieved += Convert.ToInt32(Tools.GetQuestionData(quizID, quizQuestionIndex)["questionMarks"]);
                     }
                     catch { return false; }
                     checkAnswerButton.Visible = false;
@@ -359,15 +357,15 @@ namespace quizics
             //Add the details of the last question to the database before next question
             if (quizQuestionIndex >= 0)
             {
-                using (SqlConnection connection = new SqlConnection(Tools.connectionString))
+                using (SQLiteConnection connection = new SQLiteConnection(Tools.connectionString))
                 {
-                    using (SqlCommand command = new SqlCommand("INSERT INTO UserQuestion VALUES "
+                    using (SQLiteCommand command = new SQLiteCommand("INSERT INTO UserQuestion VALUES "
                         + "(@userID, @questionID, @quizID, @userAnswer)", connection))
                     {
                         command.Parameters.AddWithValue("userID", MainMDI.userID);
                         try
                         {
-                            command.Parameters.AddWithValue("questionID", (int)Tools.GetQuestionData(quizID, quizQuestionIndex)["questionID"]);
+                            command.Parameters.AddWithValue("questionID", Convert.ToInt32(Tools.GetQuestionData(quizID, quizQuestionIndex)["questionID"]));
                         }
                         catch { return; }
                         command.Parameters.AddWithValue("quizID", quizID);

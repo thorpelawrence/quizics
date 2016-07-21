@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+using System.Data.SQLite;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.Drawing.Printing;
-using System.Data.SqlClient;
 
 namespace quizics
 {
@@ -61,9 +56,9 @@ namespace quizics
             //Check that the username and password are long enough - maximum length already handled by textbox properties
             if (username.Length >= 5 && passwordTextBox.Text.Length >= 8)
             {
-                    using (SqlConnection connection = new SqlConnection(Tools.connectionString))
+                    using (SQLiteConnection connection = new SQLiteConnection(Tools.connectionString))
                     {
-                        using (SqlCommand command = new SqlCommand("INSERT INTO Users VALUES "
+                        using (SQLiteCommand command = new SQLiteCommand("INSERT INTO Users VALUES "
                             + "(@username, @password, @yearGroup)", connection))
                         {
                             command.Parameters.AddWithValue("username", username);

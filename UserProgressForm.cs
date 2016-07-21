@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
+using System.Data.SQLite;
 using System.Windows.Forms;
-using System.Data.SqlClient;
 using System.Drawing.Printing;
 
 namespace quizics
@@ -19,9 +15,9 @@ namespace quizics
             InitializeComponent();
             this.userID = userID;
 
-            using (SqlConnection connection = new SqlConnection(Tools.connectionString))
+            using (SQLiteConnection connection = new SQLiteConnection(Tools.connectionString))
             {
-                using (SqlCommand command = new SqlCommand(
+                using (SQLiteCommand command = new SQLiteCommand(
                     "SELECT quizID, questionName, questionAnswer, userAnswer, questionMarks " +
                     "FROM UserQuestion JOIN Questions ON UserQuestion.questionID=Questions.questionID WHERE userID=@userID ORDER BY quizID DESC",
                     connection))
@@ -29,7 +25,7 @@ namespace quizics
                     command.Parameters.AddWithValue("userID", userID);
                     try
                     {
-                        SqlDataAdapter dataAdapter = new SqlDataAdapter(command);
+                        SQLiteDataAdapter dataAdapter = new SQLiteDataAdapter(command);
                         DataTable dataTable = new DataTable();
                         dataAdapter.Fill(dataTable);
                         userProgressDataGridView.DataSource = dataTable;
@@ -56,7 +52,7 @@ namespace quizics
                 {
                     //If correct, add the number of marks earned to the total
                     row.DefaultCellStyle.BackColor = Color.Lime;
-                    totalMarks += (int)row.Cells["questionMarks"].Value;
+                    totalMarks += Convert.ToInt32(row.Cells["questionMarks"].Value);
                 }
                 else
                 {

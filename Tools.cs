@@ -2,15 +2,15 @@
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.Collections.Generic;
 
 namespace quizics
 {
     static class Tools
     {
-        //Connection string used for SQL Server
-        public static string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=""" + Path.GetFullPath("quizics.mdf") + @""";Integrated Security=True";
+        //Connection string used for SQLite
+        public static string connectionString = "Data Source=quizics.sqlite;Version=3;";
 
         /// <summary>
         /// Returns a dictionary containing the data for a user corresponding to the given ID
@@ -21,15 +21,15 @@ namespace quizics
         {
             //Object is used, multiple data types can be returned
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
-                using (SqlCommand command = new SqlCommand("SELECT * FROM Users WHERE userID=@userID", connection))
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM Users WHERE userID=@userID", connection))
                 {
                     command.Parameters.AddWithValue("userID", userID);
                     try
                     {
                         connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        using (SQLiteDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
@@ -56,15 +56,15 @@ namespace quizics
         {
             //Object is used, multiple data types can be returned
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
-                using (SqlCommand command = new SqlCommand("SELECT * FROM Questions WHERE questionID=@questionID", connection))
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM Questions WHERE questionID=@questionID", connection))
                 {
                     command.Parameters.AddWithValue("questionID", questionID);
                     try
                     {
                         connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        using (SQLiteDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
@@ -94,29 +94,29 @@ namespace quizics
         {
             //Object is used, multiple data types can be returned
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 int questionID = 0;
-                using (SqlCommand command = new SqlCommand("SELECT questionID FROM QuizQuestions WHERE quizID=@quizID AND questionIndex=@questionIndex", connection))
+                using (SQLiteCommand command = new SQLiteCommand("SELECT questionID FROM QuizQuestions WHERE quizID=@quizID AND questionIndex=@questionIndex", connection))
                 {
                     command.Parameters.AddWithValue("quizID", quizID);
                     command.Parameters.AddWithValue("questionIndex", quizQuestionIndex);
                     try
                     {
                         connection.Open();
-                        questionID = (int)command.ExecuteScalar();
+                        questionID = Convert.ToInt32(command.ExecuteScalar());
                         connection.Close();
                     }
                     catch (Exception ex) { MessageBox.Show(ex.Message); }
                     finally { connection.Close(); }
                 }
-                using (SqlCommand command = new SqlCommand("SELECT * FROM Questions WHERE questionID=@questionID", connection))
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM Questions WHERE questionID=@questionID", connection))
                 {
                     command.Parameters.AddWithValue("questionID", questionID);
                     try
                     {
                         connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        using (SQLiteDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {

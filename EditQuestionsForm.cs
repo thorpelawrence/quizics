@@ -1,8 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Windows.Forms;
-using System.Data.SqlClient;
 using System.Data;
+using System.Data.SQLite;
 
 namespace quizics
 {
@@ -17,14 +16,14 @@ namespace quizics
         //Updates the DataGridView to show the data in the database
         void UpdateGrid()
         {
-            using (SqlConnection connection = new SqlConnection(Tools.connectionString))
+            using (SQLiteConnection connection = new SQLiteConnection(Tools.connectionString))
             {
-                using (SqlCommand command = new SqlCommand("SELECT questionID, questionName, questionAnswer, questionMarks "
+                using (SQLiteCommand command = new SQLiteCommand("SELECT questionID, questionName, questionAnswer, questionMarks "
                     + "FROM Questions", connection))
                 {
                     try
                     {
-                        SqlDataAdapter dataAdapter = new SqlDataAdapter(command);
+                        SQLiteDataAdapter dataAdapter = new SQLiteDataAdapter(command);
                         DataTable dataTable = new DataTable();
                         dataAdapter.Fill(dataTable);
                         questionDataGridView.DataSource = dataTable;
@@ -75,13 +74,13 @@ namespace quizics
             //Only update database if value changed, not when delete checkbox checked
             if (e.RowIndex != -1 && questionDataGridView.Columns[e.ColumnIndex].Name != "deleteCheckBox")
             {
-                    using (SqlConnection connection = new SqlConnection(Tools.connectionString))
+                    using (SQLiteConnection connection = new SQLiteConnection(Tools.connectionString))
                     {
                         string changedColumn = questionDataGridView.Columns[e.ColumnIndex].Name;
-                        using (SqlCommand command = new SqlCommand("UPDATE Questions SET " + changedColumn + "=@newValue WHERE questionID=@questionID", connection))
+                        using (SQLiteCommand command = new SQLiteCommand("UPDATE Questions SET " + changedColumn + "=@newValue WHERE questionID=@questionID", connection))
                         {
                             command.Parameters.AddWithValue("newValue", questionDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
-                            command.Parameters.AddWithValue("questionID", (int)questionDataGridView.Rows[e.RowIndex].Cells["questionID"].Value);
+                            command.Parameters.AddWithValue("questionID", Convert.ToInt32(questionDataGridView.Rows[e.RowIndex].Cells["questionID"].Value));
                             try
                             {
                                 connection.Open();
@@ -104,9 +103,9 @@ namespace quizics
                 //Check if delete checkbox is checked
                 if (Convert.ToBoolean(row.Cells["deleteCheckBox"].Value))
                 {
-                        using (SqlConnection connection = new SqlConnection(Tools.connectionString))
+                        using (SQLiteConnection connection = new SQLiteConnection(Tools.connectionString))
                         {
-                            using (SqlCommand command = new SqlCommand("DELETE FROM UserQuestion WHERE questionID=@questionID;"
+                            using (SQLiteCommand command = new SQLiteCommand("DELETE FROM UserQuestion WHERE questionID=@questionID;"
                                 + "DELETE FROM QuizQuestions WHERE questionID=@questionID;"
                                 + "DELETE FROM Questions WHERE questionID=@questionID", connection))
                             {
@@ -132,7 +131,7 @@ namespace quizics
             Form viewQuestionForm = new Form { FormBorderStyle = FormBorderStyle.SizableToolWindow, Width = 500, Height = 300, MdiParent = MdiParent };
             PictureBox questionImageBox = new PictureBox { Dock = DockStyle.Fill, SizeMode = PictureBoxSizeMode.Zoom };
             viewQuestionForm.Controls.Add(questionImageBox);
-            int questionID = (int)questionDataGridView.Rows[questionDataGridView.CurrentCell.RowIndex].Cells["questionID"].Value;
+            int questionID = Convert.ToInt32(questionDataGridView.Rows[questionDataGridView.CurrentCell.RowIndex].Cells["questionID"].Value);
             questionImageBox.Image = Tools.ByteArrayToImage((byte[])Tools.GetQuestionData(questionID)["questionImage"]);
             viewQuestionForm.Show();
         }

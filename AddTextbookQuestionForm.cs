@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+using System.Data.SQLite;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using System.Data.SqlClient;
 
 namespace quizics
 {
@@ -31,9 +26,9 @@ namespace quizics
                 !string.IsNullOrWhiteSpace(textbookNameTextBox.Text)
                 )
             {
-                using (SqlConnection connection = new SqlConnection(Tools.connectionString))
+                using (SQLiteConnection connection = new SQLiteConnection(Tools.connectionString))
                 {
-                    using (SqlCommand command = new SqlCommand("INSERT INTO Questions VALUES "
+                    using (SQLiteCommand command = new SQLiteCommand("INSERT INTO Questions VALUES "
                         + "(@questionImage, @questionName, @questionAnswer, @questionMarks)", connection))
                     {
                         command.Parameters.AddWithValue("questionImage", Tools.ImageToByteArray(Image.FromFile(imageFileLocationTextBox.Text)));

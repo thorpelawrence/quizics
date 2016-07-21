@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SQLite;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using System.Data.SqlClient;
 
 namespace quizics
 {
@@ -22,7 +22,7 @@ namespace quizics
             //Check that the user has confirmed their new password correctly
             if (confirmPasswordTextBox.Text == newPasswordTextBox.Text)
             {
-                using (SqlConnection connection = new SqlConnection(Tools.connectionString))
+                using (SQLiteConnection connection = new SQLiteConnection(Tools.connectionString))
                 {
                     //Check if user entered current password matches actual current password
                     string password = "";
@@ -36,7 +36,7 @@ namespace quizics
                         if (MessageBox.Show("Are you sure you want to change password?", "Change password",
                         MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                         {
-                            using (SqlCommand command = new SqlCommand("UPDATE Users SET password=@password WHERE userID=@userID", connection))
+                            using (SQLiteCommand command = new SQLiteCommand("UPDATE Users SET password=@password WHERE userID=@userID", connection))
                             {
                                 command.Parameters.AddWithValue("password", newPasswordTextBox.Text);
                                 command.Parameters.AddWithValue("userID", MainMDI.userID);
