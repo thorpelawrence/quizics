@@ -20,7 +20,7 @@ x86/
 bld/
 [Bb]in/*/*
 !*.exe
-!quizics.mdf
+!quizics.sqlite
 *.vshost.exe
 *.exe.*
 [Oo]bj/
