@@ -59,7 +59,7 @@ namespace quizics
                     using (SQLiteConnection connection = new SQLiteConnection(Tools.connectionString))
                     {
                         using (SQLiteCommand command = new SQLiteCommand("INSERT INTO Users VALUES "
-                            + "(@username, @password, @yearGroup)", connection))
+                            + "(NULL, @username, @password, @yearGroup)", connection))
                         {
                             command.Parameters.AddWithValue("username", username);
                             command.Parameters.AddWithValue("password", passwordTextBox.Text);

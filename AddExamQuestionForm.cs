@@ -53,7 +53,7 @@ namespace quizics
                 using (SQLiteConnection connection = new SQLiteConnection(Tools.connectionString))
                 {
                     using (SQLiteCommand command = new SQLiteCommand("INSERT INTO Questions VALUES "
-                        + "(@questionImage, @questionName, @questionAnswer, @questionMarks)", connection))
+                        + "(NULL, @questionImage, @questionName, @questionAnswer, @questionMarks)", connection))
                     {
                         command.Parameters.AddWithValue("questionImage", Tools.ImageToByteArray(Image.FromFile(imageFileLocationTextBox.Text)));
                         command.Parameters.AddWithValue("questionName", questionName);
