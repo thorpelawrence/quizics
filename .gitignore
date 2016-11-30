@@ -22,6 +22,8 @@ bld/
 !*.exe
 !quizics.sqlite
 *.vshost.exe
+!SQLite.Interop.dll
+!System.Data.SQLite.dll
 *.exe.*
 [Oo]bj/
 
